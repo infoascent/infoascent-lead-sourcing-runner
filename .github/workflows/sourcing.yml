@@ -10,6 +10,9 @@ on:
         description: 'Test : total visé dans À contacter (vide = passage normal)'
         required: false
 concurrency: sourcing
+permissions:
+  contents: read
+  actions: write   # uniquement pour se réactiver (voir la dernière étape)
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -29,3 +32,9 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      # GitHub coupe les lancements planifiés d'un repo public sans activité depuis 60 jours.
+      # Se réactiver à chaque passage remet le compteur à zéro.
+      - if: always()
+        run: gh api -X PUT repos/${{ github.repository }}/actions/workflows/sourcing.yml/enable
+        env:
+          GH_TOKEN: ${{ github.token }}
