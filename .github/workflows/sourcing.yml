@@ -1,0 +1,27 @@
+# Lance chaque matin le sourcing de leads InfoAscent. Le code vit dans un repo privé ;
+# ce repo ne contient que ce fichier. La sortie ne montre que des compteurs.
+name: sourcing
+on:
+  schedule:
+    - cron: '0 5 * * *'     # 7 h à Paris l'été, 6 h l'hiver
+  workflow_dispatch:
+concurrency: sourcing
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: infoascent/infoascent-lead-sourcing
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci --silent
+      - run: npx playwright install --with-deps chromium > /dev/null
+      - run: node run.mjs --once-a-day
+        env:
+          CLOUD: '1'
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
