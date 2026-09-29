@@ -5,6 +5,10 @@ on:
   schedule:
     - cron: '0 5 * * *'     # 7 h à Paris l'été, 6 h l'hiver
   workflow_dispatch:
+    inputs:
+      target:
+        description: 'Test : total visé dans À contacter (vide = passage normal)'
+        required: false
 concurrency: sourcing
 jobs:
   run:
@@ -19,7 +23,7 @@ jobs:
         with: { node-version: 22, cache: npm }
       - run: npm ci --silent
       - run: npx playwright install --with-deps chromium > /dev/null
-      - run: node run.mjs --once-a-day
+      - run: node run.mjs ${{ inputs.target && format('--target {0}', inputs.target) || '--once-a-day' }}
         env:
           CLOUD: '1'
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
