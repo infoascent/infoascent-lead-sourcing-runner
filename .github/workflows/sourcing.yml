@@ -2,14 +2,14 @@
 # ce repo ne contient que ce fichier. La sortie ne montre que des compteurs.
 name: sourcing
 on:
-  # Un passage dure jusqu'à 5 h 30 : il part donc la nuit pour que les leads soient là au réveil.
-  # GitHub retarde souvent les lancements planifiés (6 h de retard le 2026-09-30 sur un créneau à l'heure
-  # pile) : minutes décalées, et deux créneaux de secours. Le premier passage abouti du jour fait
-  # sortir les suivants en moins d'une minute (règle --once-a-day, journée à l'heure de Paris).
+  # Le passage part la veille au soir pour que les leads soient là à 7 h, première tâche de la journée.
+  # Il dure jusqu'à 5 h 30. GitHub retarde souvent les lancements planifiés (6 h de retard le 2026-09-30) :
+  # minutes décalées, et deux créneaux de secours. Le premier passage du cycle (18 h - 18 h, heure de
+  # Paris) fait sortir les suivants en moins d'une minute (règle --once-a-day).
   schedule:
-    - cron: '13 23 * * *'   # 1 h 13 à Paris l'été, 0 h 13 l'hiver
-    - cron: '43 0 * * *'    # secours
-    - cron: '17 2 * * *'    # secours
+    - cron: '13 17 * * *'   # 19 h 13 à Paris l'été, 18 h 13 l'hiver
+    - cron: '43 19 * * *'   # secours
+    - cron: '17 22 * * *'   # secours, dernier départ qui finit avant 7 h
   workflow_dispatch:
     inputs:
       target:
